@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import TaskForm from "../components/taskForm";
+import { getTasks, deleteTask, getSearchTasks } from "../apiServices";
+import { useNavigate } from "react-router-dom";
+import { makeStyles } from "@mui/styles";
 import {
   Table,
   TableBody,
@@ -17,8 +21,6 @@ import {
 import Grid from "@mui/material/Grid2";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import TaskForm from "../components/taskForm";
-import { getTasks, deleteTask, getSearchTasks } from "../apiServices";
 import { styled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import EditIcon from "@mui/icons-material/Edit";
@@ -26,6 +28,30 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
+
+const useStyles = makeStyles({
+  container: {
+    margin: "80px !important",
+  },
+  taskTitle: {
+    fontSize: "25px !important",
+    fontWeight: "bold !important",
+    textAlign: "left !important",
+  },
+  createTaskButton: {
+    width: "100% !important",
+    height: "55px !important",
+    backgroundColor: "#2196F3 !important",
+    color: "white !important",
+    "&:hover": { backgroundColor: "#1976D2" },
+  },
+  tableContainer: {
+    width: "100% !important",
+    overflow: "hidden !important",
+    marginTop: "40px !important",
+  },
+  tableHead: { background: "#af37f3 !important", color: "white !important" },
+});
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -48,6 +74,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const Task = () => {
+  const classes = useStyles();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -66,7 +94,6 @@ const Task = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  console.log("hgfhh", page, rowsPerPage);
 
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
@@ -78,18 +105,16 @@ const Task = () => {
       const data = await getTasks(page + 1, rowsPerPage);
       setTasks(data);
     } catch (error) {
-      console.error("Failed to fetch tasks:", error);
+      toast.error(error?.response?.data?.message, { position: "top-right" });
     }
   };
 
   const getSearchTaskData = async (name) => {
     try {
       const data = await getSearchTasks(name, page, rowsPerPage);
-      console.log("dajjj", data);
-
       setTasks(data);
     } catch (error) {
-      console.error("Failed to fetch tasks:", error);
+      toast.error(error?.response?.data?.message, { position: "top-right" });
     }
   };
 
@@ -99,10 +124,10 @@ const Task = () => {
       toast.success("Task Deleted Successfully", { position: "top-right" });
       getTasksData();
     } catch (error) {
-      console.error("Failed to delete task:", error);
       toast.error(error?.response?.data?.message, { position: "top-right" });
     }
   };
+
   useEffect(() => {
     getTasksData();
   }, [page, rowsPerPage]);
@@ -111,17 +136,12 @@ const Task = () => {
     setEditTaskData(task);
     handleOpenEdit();
   };
-  console.log("tasks", tasks);
 
   return (
-    <div style={{ margin: "80px" }}>
+    <div className={classes.container}>
       <Grid container spacing={2}>
         <Grid size={8}>
-          <Typography
-            sx={{ fontSize: "25px", fontWeight: "bold", textAlign: "left" }}
-          >
-            Task List
-          </Typography>
+          <Typography className={classes.taskTitle}>Task List</Typography>
         </Grid>
         <Grid size={2.5}>
           <TextField
@@ -147,13 +167,7 @@ const Task = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleOpenAdd}
-            sx={{
-              width: "100%",
-              height: "55px",
-              backgroundColor: "#2196F3",
-              color: "white",
-              "&:hover": { backgroundColor: "#1976D2" },
-            }}
+            className={classes.createTaskButton}
           >
             Create Task
           </Button>
@@ -166,10 +180,10 @@ const Task = () => {
           </Modal>
         </Grid>
       </Grid>
-      <Paper sx={{ width: "100%", overflow: "hidden", marginTop: "40px" }}>
+      <Paper className={classes.tableContainer}>
         <TableContainer>
           <Table>
-            <TableHead sx={{ background: "#af37f3", color: "white" }}>
+            <TableHead className={classes.tableHead}>
               <TableRow>
                 <StyledTableCell>S.No</StyledTableCell>
                 <StyledTableCell>Task Name</StyledTableCell>

@@ -9,18 +9,29 @@ const api = axios.create({
   },
 });
 
-const token = localStorage.getItem("token");
+export const login = async (formData) => {
+  try {
+    const response = await api.post("/login", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Login Error", error);
+    throw error;
+  }
+};
 
-export const setAuthToken = (token) => {
-  if (token) {
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete api.defaults.headers.common["Authorization"];
+export const register = async (formData) => {
+  try {
+    const response = await api.post("/register", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Register Error", error);
+    throw error;
   }
 };
 
 export const getTasks = async (page, limit) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await api.get(`/task?page=${page}&limit=${limit}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -35,6 +46,7 @@ export const getTasks = async (page, limit) => {
 
 export const getSearchTasks = async (name, page, limit) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await api.get(
       `/task/search?q=${name}&page=${page}&limit=${limit}`,
       {
@@ -52,6 +64,7 @@ export const getSearchTasks = async (name, page, limit) => {
 
 export const createTask = async (taskData) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await api.post("/task", taskData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -64,6 +77,7 @@ export const createTask = async (taskData) => {
 
 export const updateTask = async (taskId, updatedData) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await api.put(`/task/${taskId}`, updatedData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -76,6 +90,7 @@ export const updateTask = async (taskId, updatedData) => {
 
 export const deleteTask = async (taskId) => {
   try {
+    const token = localStorage.getItem("token");
     await api.delete(`/task/${taskId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createTask, updateTask } from "../apiServices";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -16,16 +17,45 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { createTask, updateTask } from "../apiServices";
+import { makeStyles } from "@mui/styles";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const useStyles = makeStyles({
+  taskTitle: {
+    fontSize: "20px !important",
+    fontWeight: "bold !important",
+  },
+  textField: {
+    marginTop: "20px !important",
+    width: "100% !important",
+  },
+  saveButton: {
+    marginTop: "20px !important",
+    width: "20% !important",
+    height: "40px !important",
+    backgroundColor: "#4CAF50 !important",
+    color: "white !important",
+    "&:hover": { backgroundColor: "#45A049" },
+  },
+  buttonContainer: {
+    width: "100% !important",
+    display: "flex !important",
+    justifyContent: "end !important",
+    alignItems: "center !important",
+  },
+  boxContainer: {
+    flexGrow: 1,
+    marginTop: "15px !important",
+  },
+});
+
 const TaskForm = (props) => {
+  const classes = useStyles();
   const { status, handleClose, getTasksData, data } = props;
-  console.log("data", data);
+
   const formattedStartDate = dayjs(data?.startDate).format("YYYY-MM-DD");
   const formattedEndDate = dayjs(data?.endDate).format("YYYY-MM-DD");
-  console.log("dfdsfsd", formattedStartDate, formattedEndDate);
 
   const [formData, setFormData] = useState({
     name: status == "Edit" ? data.name : "",
@@ -42,7 +72,6 @@ const TaskForm = (props) => {
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
-  console.log("formData", formData, startDate, endDate);
 
   const handleCreateTask = async (formDatas) => {
     try {
@@ -52,7 +81,6 @@ const TaskForm = (props) => {
       handleClose();
       getTasksData();
     } catch (error) {
-      console.error("Failed to create task:", error);
       toast.error(error?.response?.data?.message, { position: "top-right" });
     }
   };
@@ -64,7 +92,6 @@ const TaskForm = (props) => {
       handleClose();
       getTasksData();
     } catch (error) {
-      console.error("Failed to update task:", error);
       toast.error(error?.response?.data?.message, { position: "top-right" });
     }
   };
@@ -100,15 +127,13 @@ const TaskForm = (props) => {
     >
       <Grid container spacing={2}>
         <Grid size={8}>
-          <Typography sx={{ fontSize: "20px", fontWeight: "bold" }}>
-            Add Task
-          </Typography>
+          <Typography className={classes.taskTitle}>Add Task</Typography>
         </Grid>
         <Grid size={4} display={"flex"} justifyContent={"end"}>
           <CloseIcon onClick={handleClose} sx={{ cursor: "pointer" }} />
         </Grid>
       </Grid>
-      <Box sx={{ flexGrow: 1, mt: 3 }}>
+      <Box className={classes.boxContainer}>
         <Grid container spacing={2}>
           <Grid size={6}>
             <TextField
@@ -120,9 +145,9 @@ const TaskForm = (props) => {
               fullWidth
               required
               onChange={handleChange}
-              sx={{ mt: 5 }}
+              className={classes.textField}
             />
-            <Box sx={{ mt: 5 }}>
+            <Box className={classes.textField}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker"]}>
                   <DatePicker
@@ -136,7 +161,7 @@ const TaskForm = (props) => {
                 </DemoContainer>
               </LocalizationProvider>
             </Box>
-            <FormControl fullWidth sx={{ mt: 5 }}>
+            <FormControl fullWidth className={classes.textField}>
               <InputLabel id="demo-simple-select-label">Status</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
@@ -160,16 +185,16 @@ const TaskForm = (props) => {
               value={formData?.description}
               required
               onChange={handleChange}
-              sx={{ mt: 5 }}
+              className={classes.textField}
             />
-            <Box sx={{ mt: 5 }}>
+            <Box className={classes.textField}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker", "DatePicker"]}>
                   <DatePicker
                     label="End Date"
                     value={endDate}
                     onChange={(newValue) => setEndDate(newValue)}
-                    sx={{ width: "100%", mt: 5 }}
+                    sx={{ width: "100%" }}
                   />
                 </DemoContainer>
               </LocalizationProvider>
@@ -181,33 +206,18 @@ const TaskForm = (props) => {
               value={formData?.totalTask}
               variant="outlined"
               fullWidth
-              required
               onChange={handleChange}
-              sx={{ mt: 5 }}
+              className={classes.textField}
             />
           </Grid>
         </Grid>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "end",
-            alignItems: "center",
-          }}
-        >
+        <div className={classes.buttonContainer}>
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{
-              mt: 5,
-              width: "20%",
-              height: "40px",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              "&:hover": { backgroundColor: "#45A049" },
-            }}
+            className={classes.saveButton}
             onClick={handleSubmit}
           >
             {status == "Edit" ? "Update" : "Save"}

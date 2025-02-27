@@ -1,72 +1,97 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../apiServices";
+import LoginImg from "../assets/images/loginImg.jpg";
 import Grid from "@mui/material/Grid2";
 import { Typography, TextField, Button, Box, Paper } from "@mui/material";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import LoginImg from "../assets/images/loginImg.jpg";
+import { makeStyles } from "@mui/styles";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const useStyles = makeStyles({
+  container: {
+    flexGrow: 1,
+    background: "#af37f3",
+    width: "100%",
+    height: "100vh",
+  },
+  gridContainer: {
+    height: "99vh",
+  },
+  loginBox: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginContainer: {
+    width: 500,
+    padding: "20px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 2,
+    marginTop: "30%",
+    borderRadius: "10px !important",
+  },
+  loginTitle: {
+    fontSize: "30px !important",
+    fontWeight: "bold !important",
+  },
+  loginButton: {
+    marginTop: "25px !important",
+    background: "#af37f3 !important",
+    height: "50px !important",
+  },
+  signupStyle: {
+    color: "#1976d2",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  textField: {
+    marginTop: "20px !important",
+  },
+});
+
 const Login = () => {
+  const classes = useStyles();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Form Data:", formData);
-    axios
-      .post("http://localhost:8000/api/login", formData)
-      .then((res) => {
-        localStorage.setItem("token", res.data.token);
-        toast.success("Login Successfully", { position: "top-right" });
-        navigate("/task");
-      })
-      .catch((err) => {
-        console.log("err", err);
-        toast.error(err?.response?.data?.message, { position: "top-right" });
-      });
+  const postLoginData = async (formData) => {
+    try {
+      const data = await login(formData);
+      localStorage.setItem("token", data.token);
+      toast.success("Login Successfully", { position: "top-right" });
+      navigate("/task");
+    } catch (error) {
+      console.error("Failed to fetch tasks:", error);
+      toast.error(error?.response?.data?.message, { position: "top-right" });
+    }
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    postLoginData(formData);
+  };
+
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
+  
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        background: "#af37f3",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Grid container spacing={2} sx={{ height: "99vh" }}>
-        <Grid size={6} sx={{ height: "99vh" }}>
+    <Box className={classes.container}>
+      <Grid container spacing={2} className={classes.gridContainer}>
+        <Grid size={6} className={classes.gridContainer}>
           <img src={LoginImg} height={"100%"} width={"100%"} />
         </Grid>
         <Grid size={6}>
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Paper
-              sx={{
-                width: 450,
-                padding: 3,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 2,
-                marginTop: "30%",
-                borderRadius: "10px",
-              }}
-            >
-              <Typography sx={{ fontSize: "30px", fontWeight: "bold" }}>
-                LOGIN
-              </Typography>
+          <Box className={classes.loginBox}>
+            <Paper className={classes.loginContainer}>
+              <Typography className={classes.loginTitle}>LOGIN</Typography>
               <TextField
                 label="Email"
                 name="email"
@@ -75,7 +100,7 @@ const Login = () => {
                 fullWidth
                 required
                 onChange={handleChange}
-                sx={{ mt: 2, mb: 2 }}
+                className={classes.textField}
               />
               <TextField
                 label="Password"
@@ -85,13 +110,14 @@ const Login = () => {
                 fullWidth
                 required
                 onChange={handleChange}
+                className={classes.textField}
               />
 
               <Button
                 type="submit"
                 variant="contained"
                 fullWidth
-                sx={{ mt: 2, background: "#af37f3", height: "50px" }}
+                className={classes.loginButton}
                 onClick={handleSubmit}
               >
                 Login
@@ -99,11 +125,7 @@ const Login = () => {
               <Typography mt={2}>
                 Don't have an account?{" "}
                 <span
-                  style={{
-                    color: "#1976d2",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                  }}
+                  className={classes.signupStyle}
                   onClick={() => navigate("/register")}
                 >
                   Signup
