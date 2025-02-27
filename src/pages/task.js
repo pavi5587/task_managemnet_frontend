@@ -145,7 +145,7 @@ const Task = () => {
         </Grid>
         <Grid size={2.5}>
           <TextField
-            label="Search"
+            label="Search name or status"
             variant="outlined"
             fullWidth
             value={search}
