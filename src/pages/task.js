@@ -136,7 +136,7 @@ const Task = () => {
     setEditTaskData(task);
     handleOpenEdit();
   };
-
+  console.log("search", search);
   return (
     <div className={classes.container}>
       <Grid container spacing={2}>
@@ -153,12 +153,14 @@ const Task = () => {
               setSearch(e.target.value);
               getSearchTaskData(e.target.value);
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
         </Grid>
